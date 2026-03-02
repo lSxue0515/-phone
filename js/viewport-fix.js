@@ -1,167 +1,113 @@
-/* ============================================
-   蛋薯机 DanShu Pro — viewport-fix.js
-   手机端全屏视口 · 安全区 · 键盘适配
-   PC 端完全不影响
-   ============================================ */
-
 (function () {
     'use strict';
 
-    /* ===== 1. 是否手机端 ===== */
-    function isMobile() {
-        return window.innerWidth <= 768 ||
-            /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    var isAndroid = /Android/i.test(ua);
+    var root = document.documentElement;
+
+    // 确保 class 在（head里已加过一次，这里兜底）
+    if (isIOS && !root.classList.contains('is-ios')) root.classList.add('is-ios');
+    if (isAndroid && !root.classList.contains('is-android')) root.classList.add('is-android');
+
+    // ========== 实时视口高度 ==========
+    var lastH = 0;
+
+    function setHeight() {
+        if (window.innerWidth > 768) return;
+
+        var h = window.innerHeight;
+        if (window.visualViewport) h = window.visualViewport.height;
+
+        if (isAndroid) {
+            var ch = document.documentElement.clientHeight;
+            if (ch > 0 && ch < h) h = ch;
+        }
+
+        if (Math.abs(h - lastH) < 1) return;
+        lastH = h;
+
+        root.style.setProperty('--app-height', h + 'px');
+
+        var frame = document.getElementById('phoneFrame');
+        if (frame) frame.style.height = h + 'px';
     }
 
-    /* ===== 2. 动态视口高度（解决 iOS Safari 100vh 包含地址栏的问题）===== */
-    var _lastVh = 0;
+    setHeight();
+    window.addEventListener('resize', setHeight);
+    window.addEventListener('orientationchange', function () { setTimeout(setHeight, 300); });
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', setHeight);
+    }
 
-    function updateViewportHeight() {
-        if (!isMobile()) return;
+    // ========== iOS 键盘修复 ==========
+    // 核心：键盘弹出时 visualViewport.height 变小
+    // 我们把 phone-frame 高度缩到可见区域，聊天界面自然跟着缩
 
-        var vh;
-        // 优先使用 visualViewport（最准确，排除键盘）
+    var kbActive = false;
+
+    window._chatInputFocus = function () {
+        kbActive = true;
+        if (isIOS && window.visualViewport) {
+            window.visualViewport.addEventListener('resize', onKbResize);
+            window.visualViewport.addEventListener('scroll', onKbScroll);
+            setTimeout(fixKb, 100);
+            setTimeout(fixKb, 300);
+            setTimeout(fixKb, 600);
+        }
+        if (isAndroid) {
+            setTimeout(function () {
+                var b = document.getElementById('chatConvBody');
+                if (b) b.scrollTop = b.scrollHeight;
+            }, 400);
+        }
+    };
+
+    window._chatInputBlur = function () {
+        kbActive = false;
         if (window.visualViewport) {
-            vh = window.visualViewport.height;
-        } else {
-            vh = window.innerHeight;
+            window.visualViewport.removeEventListener('resize', onKbResize);
+            window.visualViewport.removeEventListener('scroll', onKbScroll);
         }
+        // 恢复
+        var conv = document.getElementById('chatConversation');
+        if (conv) conv.style.height = '';
+        setTimeout(function () {
+            window.scrollTo(0, 0);
+            setHeight();
+        }, 100);
+    };
 
-        // 防抖：高度变化小于 1px 不更新
-        if (Math.abs(vh - _lastVh) < 1) return;
-        _lastVh = vh;
-
-        var root = document.documentElement;
-        // --vh: 1% of real viewport height
-        root.style.setProperty('--vh', (vh * 0.01) + 'px');
-        // --app-height: full viewport height
-        root.style.setProperty('--app-height', vh + 'px');
+    function onKbResize() {
+        if (kbActive) fixKb();
     }
 
-    /* ===== 3. 绑定事件 ===== */
-    function bindEvents() {
-        // visualViewport resize（iOS Safari 最可靠的方式）
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', updateViewportHeight);
-            window.visualViewport.addEventListener('scroll', updateViewportHeight);
-        }
-
-        // 传统 resize 兜底
-        window.addEventListener('resize', updateViewportHeight);
-
-        // 屏幕旋转
-        window.addEventListener('orientationchange', function () {
-            setTimeout(updateViewportHeight, 100);
-            setTimeout(updateViewportHeight, 300);
-            setTimeout(updateViewportHeight, 500);
-        });
-
-        // 页面从后台恢复
-        document.addEventListener('visibilitychange', function () {
-            if (!document.hidden) {
-                setTimeout(updateViewportHeight, 100);
-            }
-        });
-    }
-
-    /* ===== 4. iOS 弹性滚动锁死 ===== */
-    function preventBounce() {
-        if (!isMobile()) return;
-
-        // 阻止 body 层的弹性滚动
-        document.body.addEventListener('touchmove', function (e) {
-            // 如果触摸的元素在一个可滚动容器内，不阻止
-            var el = e.target;
-            while (el && el !== document.body) {
-                var style = window.getComputedStyle(el);
-                var overflow = style.overflowY || style.overflow;
-                if (overflow === 'auto' || overflow === 'scroll') {
-                    // 已经滚到边界时也阻止
-                    if (el.scrollHeight > el.clientHeight) {
-                        return; // 允许滚动
-                    }
-                }
-                el = el.parentElement;
-            }
-            // body 自身不允许弹性滚动
-            if (e.cancelable) e.preventDefault();
-        }, { passive: false });
-    }
-
-    /* ===== 5. iOS standalone 检测 ===== */
-    function isStandalone() {
-        return window.navigator.standalone === true ||
-            window.matchMedia('(display-mode: standalone)').matches;
-    }
-
-    /* ===== 6. 添加 class 标记供 CSS 使用 ===== */
-    function addPlatformClasses() {
-        var html = document.documentElement;
-
-        if (isMobile()) {
-            html.classList.add('is-mobile');
-        }
-
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            html.classList.add('is-ios');
-        }
-
-        if (/Android/i.test(navigator.userAgent)) {
-            html.classList.add('is-android');
-        }
-
-        if (isStandalone()) {
-            html.classList.add('is-standalone');
-        }
-
-        // 有刘海的 iPhone（safe-area-inset-top > 0）
-        if (CSS.supports && CSS.supports('padding-top: env(safe-area-inset-top)')) {
-            html.classList.add('has-safe-area');
+    function onKbScroll() {
+        if (window.visualViewport && window.visualViewport.offsetTop > 0) {
+            window.scrollTo(0, 0);
         }
     }
 
-    /* ===== 7. 键盘弹起适配 ===== */
-    function handleKeyboard() {
-        if (!isMobile()) return;
+    function fixKb() {
+        if (!kbActive || !window.visualViewport) return;
 
-        var originalHeight = window.innerHeight;
+        var h = window.visualViewport.height;
 
-        if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', function () {
-                var currentHeight = window.visualViewport.height;
-                var diff = originalHeight - currentHeight;
+        // 缩小 phone-frame 到可见高度
+        var frame = document.getElementById('phoneFrame');
+        if (frame) frame.style.height = h + 'px';
 
-                if (diff > 100) {
-                    // 键盘弹起
-                    document.documentElement.classList.add('keyboard-open');
-                } else {
-                    // 键盘收起
-                    document.documentElement.classList.remove('keyboard-open');
-                    // 重新同步原始高度
-                    originalHeight = window.innerHeight;
-                }
-            });
-        }
-    }
+        // 聊天容器也缩到这个高度
+        var conv = document.getElementById('chatConversation');
+        if (conv) conv.style.height = h + 'px';
 
-    /* ===== 初始化 ===== */
-    function init() {
-        addPlatformClasses();
-        updateViewportHeight();
-        bindEvents();
-        preventBounce();
-        handleKeyboard();
+        // 滚到最新消息
+        var body = document.getElementById('chatConvBody');
+        if (body) body.scrollTop = body.scrollHeight;
 
-        // 延迟再算一次（等浏览器 UI 稳定）
-        setTimeout(updateViewportHeight, 50);
-        setTimeout(updateViewportHeight, 200);
-        setTimeout(updateViewportHeight, 500);
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-    } else {
-        init();
+        // 禁止页面滚动
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
     }
 
 })();
