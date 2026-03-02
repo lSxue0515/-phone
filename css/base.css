@@ -233,24 +233,12 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ===== 手机端全屏适配 ===== */
+/* ===== 手机端全屏铺满，去除app状态栏 ===== */
 @media screen and (max-width: 768px) {
 
     :root {
         --phone-radius: 0px;
         --phone-border: 0px;
-        --status-bar-height: 0px;
-        --home-indicator-height: 0px;
-        --icon-size: 46px;
-        --icon-radius: 12px;
-        --dock-height: 64px;
-    }
-
-    html {
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
     }
 
     body {
@@ -258,17 +246,10 @@ body {
         padding: 0;
         background: #000;
         overflow: hidden;
-        width: 100%;
-        height: 100vh;
-        height: 100dvh;
-        position: fixed;
-        top: 0;
-        left: 0;
     }
 
-    /* ★ 彻底去掉手机框架 */
     .phone-frame {
-        width: 100% !important;
+        width: 100vw !important;
         height: 100vh !important;
         height: 100dvh !important;
         max-width: none !important;
@@ -293,55 +274,22 @@ body {
         border-radius: 0 !important;
     }
 
-    /* ★★★ 隐藏 app 自带状态栏（手机系统自己有）★★★ */
+    /* ★★★ 核心：隐藏app自带的状态栏，高度归零 ★★★ */
     .status-bar {
         display: none !important;
+        height: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
-    /* ★★★ 隐藏底部横条（手机系统自己有）★★★ */
-    .home-indicator {
-        display: none !important;
-    }
-
-    /* ★ 内容区撑满剩余空间 */
+    /* ★ 内容区自动撑满（状态栏没了，内容自然往上顶） */
     .pages-viewport {
         flex: 1 1 0 !important;
         min-height: 0 !important;
         overflow: hidden !important;
     }
 
-    .page {
-        height: 100% !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* ★★★ 主屏幕内容整体缩小 20% ★★★ */
-    .grid-container {
-        transform: scale(0.80);
-        transform-origin: top center;
-    }
-
-    /* Dock 栏也缩紧 */
-    .dock-container {
-        padding: 6px 12px !important;
-    }
-
-    .dock-container .dock-icon {
-        width: 46px !important;
-        height: 46px !important;
-    }
-
-    .dock-container .dock-icon svg {
-        width: 20px !important;
-        height: 20px !important;
-    }
-
-    .dock-container .dock-label {
-        font-size: 9px !important;
-    }
-
-    /* 所有覆盖层去圆角 */
+    /* 所有APP覆盖层去圆角 */
     .chat-app-overlay,
     .novel-overlay,
     .forum-overlay,
@@ -354,12 +302,5 @@ body {
     .chat-conv-overlay,
     [class*="-overlay"] {
         border-radius: 0 !important;
-    }
-
-    /* 输入框去 iOS 默认圆角 */
-    .chat-conv-input,
-    input[type="text"] {
-        -webkit-appearance: none;
-        appearance: none;
     }
 }
