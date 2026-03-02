@@ -336,18 +336,26 @@ body {
         padding: 4px 0 !important;
     }
 
-    /* ★★★ 第一页：缩小到 80% ★★★ */
+    /* ★★★ 第一页：缩小到 85% ★★★ */
     .page-1>.grid-container {
-        transform: scale(0.80) !important;
+        transform: scale(0.85) !important;
         transform-origin: top center !important;
         padding-top: 5px !important;
     }
 
-    /* ★★★ 第三页：缩小到 80% ★★★ */
+    /* ★★★ 第三页：整个 page 内容缩小到 85% ★★★ */
     .page-3>.grid-container {
-        transform: scale(0.80) !important;
+        transform: scale(0.85) !important;
         transform-origin: top center !important;
         padding-top: 5px !important;
+    }
+
+    /* 保险：如果 page-3 没有 grid-container，直接缩页面内所有内容 */
+    .page-3 .p3-profile-widget,
+    .page-3 .p3-contact-widget,
+    .page-3 .p3-status-widget {
+        transform: scale(0.90) !important;
+        transform-origin: top center !important;
     }
 
     /* 所有APP覆盖层去圆角 */
