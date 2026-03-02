@@ -3,7 +3,16 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <script>
+        (function () {
+            var u = navigator.userAgent || '';
+            var c = document.documentElement.classList;
+            if (/Android/i.test(u)) c.add('is-android');
+            if (/iPhone|iPad|iPod/i.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) c.add('is-ios');
+        })();
+    </script>
     <title>蛋薯机 DanShu Pro</title>
 
     <!-- ★★★ 开机遮挡：fixed定位，绝对挡住一切 ★★★ -->
@@ -1858,6 +1867,7 @@
     <script src="js/boot.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/viewport-fix.js"></script>
     <script src="js/pages.js"></script>
     <script src="js/card.js"></script>
     <script src="js/countdown.js"></script>
