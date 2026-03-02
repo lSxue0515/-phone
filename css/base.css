@@ -336,27 +336,57 @@ body {
         padding: 4px 0 !important;
     }
 
-    /* ★★★ 第一页：缩小到 85%（有 grid-container）★★★ */
+    /* ★★★ 第一页：缩小到 90% ★★★ */
     .page-1>.grid-container {
-        transform: scale(0.85) !important;
+        transform: scale(0.90) !important;
         transform-origin: top center !important;
         padding-top: 5px !important;
     }
 
-    /* ★★★ 第三页：没有 grid-container，直接缩 page-3 的内容 ★★★ */
+    /* ★★★ 第三页：整页内容统一缩放，避免间距问题 ★★★ */
     .page-3 {
-        padding: 0 10px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 0 !important;
+    }
+
+    .page-3::before {
+        content: '' !important;
+        display: block !important;
+        width: 100% !important;
+        height: 0 !important;
+    }
+
+    /* 用一个内层包裹的思路：直接缩整个 page-3 的子元素流 */
+    .page-3>* {
+        transform-origin: top center !important;
     }
 
     .page-3>.p3-profile-widget {
-        transform: scale(0.85) !important;
+        transform: scale(0.88) !important;
         transform-origin: top center !important;
         margin-top: 5px !important;
+        margin-bottom: -40px !important;
+        width: 100% !important;
     }
 
     .page-3>.p3-contact-widget {
-        transform: scale(0.85) !important;
+        transform: scale(0.88) !important;
         transform-origin: top center !important;
+        margin-top: 0 !important;
+        margin-bottom: -30px !important;
+        width: 100% !important;
+    }
+
+    /* 第三页其他可能的子组件也缩 */
+    .page-3>.p3-status-widget,
+    .page-3>.p3-gallery-widget,
+    .page-3>.p3-links-widget {
+        transform: scale(0.88) !important;
+        transform-origin: top center !important;
+        margin-bottom: -25px !important;
+        width: 100% !important;
     }
 
     /* 所有APP覆盖层去圆角 */
