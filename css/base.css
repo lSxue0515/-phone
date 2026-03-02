@@ -233,12 +233,17 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ===== 手机端全屏铺满 ===== */
+/* ===== 手机端全屏适配 ===== */
 @media screen and (max-width: 768px) {
 
     :root {
         --phone-radius: 0px;
         --phone-border: 0px;
+        --status-bar-height: 0px;
+        --home-indicator-height: 0px;
+        --icon-size: 46px;
+        --icon-radius: 12px;
+        --dock-height: 64px;
     }
 
     html {
@@ -261,6 +266,7 @@ body {
         left: 0;
     }
 
+    /* ★ 彻底去掉手机框架 */
     .phone-frame {
         width: 100% !important;
         height: 100vh !important;
@@ -287,7 +293,17 @@ body {
         border-radius: 0 !important;
     }
 
-    /* ★ 内容区自动撑满 */
+    /* ★★★ 隐藏 app 自带状态栏（手机系统自己有）★★★ */
+    .status-bar {
+        display: none !important;
+    }
+
+    /* ★★★ 隐藏底部横条（手机系统自己有）★★★ */
+    .home-indicator {
+        display: none !important;
+    }
+
+    /* ★ 内容区撑满剩余空间 */
     .pages-viewport {
         flex: 1 1 0 !important;
         min-height: 0 !important;
@@ -300,28 +316,29 @@ body {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* ★★★ 安卓：隐藏app自带的状态栏和底部横条 ★★★
-       安卓系统已经有状态栏和导航栏，app再画就是双份，白白占空间 */
-    html.is-android .status-bar {
-        display: none !important;
+    /* ★★★ 主屏幕内容整体缩小 20% ★★★ */
+    .grid-container {
+        transform: scale(0.80);
+        transform-origin: top center;
     }
 
-    html.is-android .home-indicator {
-        display: none !important;
+    /* Dock 栏也缩紧 */
+    .dock-container {
+        padding: 6px 12px !important;
     }
 
-    /* ★★★ iOS：适配刘海和底部安全区 ★★★ */
-    html.is-ios .status-bar {
-        height: calc(var(--status-bar-height) + env(safe-area-inset-top, 0px));
-        padding-top: env(safe-area-inset-top, 16px);
+    .dock-container .dock-icon {
+        width: 46px !important;
+        height: 46px !important;
     }
 
-    html.is-ios .home-indicator {
-        padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+    .dock-container .dock-icon svg {
+        width: 20px !important;
+        height: 20px !important;
     }
 
-    html.is-ios .dock-container {
-        padding-bottom: env(safe-area-inset-bottom, 0px);
+    .dock-container .dock-label {
+        font-size: 9px !important;
     }
 
     /* 所有覆盖层去圆角 */
@@ -339,7 +356,7 @@ body {
         border-radius: 0 !important;
     }
 
-    /* 输入框去iOS默认圆角 */
+    /* 输入框去 iOS 默认圆角 */
     .chat-conv-input,
     input[type="text"] {
         -webkit-appearance: none;
