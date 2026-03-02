@@ -336,16 +336,17 @@ body {
         padding: 4px 0 !important;
     }
 
-    /* ★★★ 第一页 & 第三页：整体缩小 85% ★★★ */
-    .page[data-page="1"] .grid-container {
-        transform: scale(0.85);
-        transform-origin: top center;
+    /* ★★★ 第一页：缩小到 80% ★★★ */
+    .page-1>.grid-container {
+        transform: scale(0.80) !important;
+        transform-origin: top center !important;
         padding-top: 5px !important;
     }
 
-    .page[data-page="3"] .grid-container {
-        transform: scale(0.85);
-        transform-origin: top center;
+    /* ★★★ 第三页：缩小到 80% ★★★ */
+    .page-3>.grid-container {
+        transform: scale(0.80) !important;
+        transform-origin: top center !important;
         padding-top: 5px !important;
     }
 
