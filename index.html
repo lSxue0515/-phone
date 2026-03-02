@@ -8,9 +8,9 @@
     <script>
         (function () {
             var u = navigator.userAgent || '';
-            var c = document.documentElement.classList;
-            if (/Android/i.test(u)) c.add('is-android');
-            if (/iPhone|iPad|iPod/i.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) c.add('is-ios');
+            var h = document.documentElement;
+            if (/Android/i.test(u)) h.classList.add('is-android');
+            if (/iPhone|iPad|iPod/i.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) h.classList.add('is-ios');
         })();
     </script>
     <title>蛋薯机 DanShu Pro</title>
