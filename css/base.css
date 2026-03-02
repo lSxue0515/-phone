@@ -1,6 +1,5 @@
 /* ============================================
    蛋薯机 DanShu Pro v2 — base.css
-   全屏适配 · 安全区 · 动态视口
    ============================================ */
 
 *,
@@ -35,25 +34,10 @@
     --icon-size: 54px;
     --icon-radius: 15px;
     --icon-svg: 24px;
-
-    /* ★ 动态视口高度（JS 会覆盖） */
-    --vh: 1vh;
-    --app-height: 100vh;
-
-    /* ★ 安全区变量（有刘海的设备会被 env() 覆盖） */
-    --sat: env(safe-area-inset-top, 0px);
-    --sab: env(safe-area-inset-bottom, 0px);
-    --sal: env(safe-area-inset-left, 0px);
-    --sar: env(safe-area-inset-right, 0px);
 }
 
 html {
     font-size: 16px;
-    /* ★ 防止 iOS 弹性过滚 */
-    overflow: hidden;
-    height: 100%;
-    position: fixed;
-    width: 100%;
 }
 
 body {
@@ -62,23 +46,14 @@ body {
     align-items: center;
     min-height: 100vh;
     min-height: 100dvh;
-    min-height: var(--app-height);
     background: #e8e8ec;
     font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     overflow: hidden;
-    /* ★ 防止 iOS 弹性拖拽 */
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-    position: fixed;
-    width: 100%;
-    height: 100%;
 }
 
-/* ============================================
-   手机外壳（PC端）
-   ============================================ */
+/* 手机外壳 */
 .phone-frame {
     position: relative;
     width: var(--phone-width);
@@ -118,7 +93,10 @@ body {
 .wallpaper::after {
     content: '';
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: linear-gradient(180deg,
             rgba(0, 0, 0, 0.05) 0%,
             rgba(0, 0, 0, 0.0) 30%,
@@ -126,9 +104,7 @@ body {
             rgba(0, 0, 0, 0.1) 100%);
 }
 
-/* ============================================
-   状态栏
-   ============================================ */
+/* 状态栏 */
 .status-bar {
     height: var(--status-bar-height);
     padding: 16px 26px 0;
@@ -206,7 +182,6 @@ body {
     height: 0;
 }
 
-/* 隐藏编辑提示气泡 */
 [contenteditable]::before,
 [contenteditable]::after {
     display: none !important;
@@ -221,12 +196,9 @@ body {
     -webkit-tap-highlight-color: transparent;
     -webkit-user-select: text;
     user-select: text;
-    spellcheck: false;
 }
 
-/* ============================================
-   Toast（手机内部定位）
-   ============================================ */
+/* ========== Toast ========== */
 .toast {
     position: absolute;
     bottom: 120px;
@@ -259,123 +231,53 @@ body {
     transform: translateX(-50%) translateY(0);
 }
 
-/* ============================================
-   ★★★ 手机端全屏适配（核心修复）★★★
-   ============================================ */
+/* ==============================================
+   ★★★ 手机端：保持手机造型，缩放到85%屏幕 ★★★
+   ============================================== */
 @media screen and (max-width: 768px) {
-
-    :root {
-        --phone-radius: 0px;
-        --phone-border: 0px;
-    }
-
-    html {
-        /* 锁死根元素，防止 iOS 弹性滚动 */
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-    }
 
     body {
         margin: 0;
         padding: 0;
-        background: #000;
+        background: #111;
         overflow: hidden;
-        /* ★ 多层高度 fallback ★ */
-        height: 100vh;
-        height: 100dvh;
-        height: var(--app-height);
-        min-height: 0;
+        /* 锁死视口，防止iOS键盘推页面 */
         position: fixed;
-        top: 0;
-        left: 0;
         width: 100%;
+        height: 100%;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
+    /* ★ 核心：保持手机造型，按屏幕85%缩放 ★ */
     .phone-frame {
-        width: 100% !important;
-        /* ★ 多层高度 fallback ★
-           100vh = 最大（含地址栏）
-           100dvh = 动态视口（Safari 15+）
-           var(--app-height) = JS 实时计算 */
-        height: 100vh !important;
-        height: 100dvh !important;
-        height: var(--app-height) !important;
-        max-width: none !important;
-        max-height: none !important;
-        border-radius: 0 !important;
-        border: none !important;
-        box-shadow: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        transform: none !important;
-        background: transparent !important;
-        /* ★ 安全区内边距 ★ */
-        padding-top: env(safe-area-inset-top, 0px) !important;
-        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-        padding-left: env(safe-area-inset-left, 0px) !important;
-        padding-right: env(safe-area-inset-right, 0px) !important;
+        /* 宽度 = 屏幕宽度的85% */
+        width: 85vw !important;
+        /* 高度 = 按9:19.5比例（iPhone比例）计算，但不超过屏幕高度的88% */
+        height: calc(85vw * 2.167) !important;
+        max-height: 88vh !important;
+        max-height: 88dvh !important;
+        /* 保持圆角和边框 */
+        border-radius: 40px !important;
+        border: 3px solid rgba(120, 120, 130, 0.6) !important;
+        /* 居中 */
+        position: relative !important;
+        margin: auto !important;
+        /* 阴影 */
+        box-shadow:
+            0 0 0 1px rgba(0, 0, 0, 0.2),
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
     }
 
-    .phone-frame::before {
-        display: none !important;
-    }
-
-    /* 壁纸铺满（忽略安全区，铺到边缘） */
+    /* 壁纸保持圆角 */
     .wallpaper {
-        border-radius: 0 !important;
-        /* 壁纸延伸到安全区外 */
-        top: calc(-1 * env(safe-area-inset-top, 0px)) !important;
-        bottom: calc(-1 * env(safe-area-inset-bottom, 0px)) !important;
-        left: calc(-1 * env(safe-area-inset-left, 0px)) !important;
-        right: calc(-1 * env(safe-area-inset-right, 0px)) !important;
+        border-radius: 37px !important;
     }
 
-    /* ★ 状态栏适配顶部安全区 ★ */
-    .status-bar {
-        padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
-        /* 如果有刘海，增高 */
-        height: calc(var(--status-bar-height) + env(safe-area-inset-top, 0px)) !important;
-    }
-
-    /* ★ Dock 适配底部安全区 ★ */
-    .dock-container {
-        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
-    }
-
-    /* ★ Home-indicator 移入安全区内 ★ */
-    .home-indicator {
-        padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px)) !important;
-    }
-
-    /* ★ pages-viewport 铺满剩余空间 ★ */
-    .pages-viewport {
-        flex: 1 1 0 !important;
-        min-height: 0 !important;
-        overflow: hidden !important;
-    }
-
-    /* ★ 每一页铺满视口 ★ */
-    .page {
-        height: 100% !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* ★ 第三页内容滚动修复 ★ */
-    .page.page-3 {
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-        /* 防止内容溢出被 dock 遮挡 */
-        padding-bottom: 20px !important;
-    }
-
-    /* 所有覆盖层去圆角 + 适配安全区 */
+    /* 覆盖层限制在手机框内 */
     .chat-app-overlay,
     .novel-overlay,
     .forum-overlay,
@@ -387,86 +289,29 @@ body {
     .chat-transfer-overlay,
     .chat-conv-overlay,
     [class*="-overlay"] {
-        border-radius: 0 !important;
-        /* ★ overlay 也要撑满真实视口 ★ */
-        height: 100vh !important;
-        height: 100dvh !important;
-        height: var(--app-height) !important;
-    }
-
-    /* ★ Toast 在手机端避开底部安全区 ★ */
-    .toast {
-        bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+        border-radius: 37px !important;
     }
 }
 
-/* ============================================
-   ★★★ iOS Safari 特殊处理 ★★★
-   ============================================ */
-
-/* iOS standalone（添加到主屏幕后）*/
-@media screen and (max-width: 768px) and (display-mode: standalone) {
-
-    /* standalone 模式没有地址栏，可以用 100vh */
-    body,
+/* ★ 超窄屏（宽<360）缩得再小一点 */
+@media screen and (max-width: 360px) {
     .phone-frame {
-        height: 100vh !important;
-        height: 100dvh !important;
-    }
-
-    /* standalone 的状态栏由系统绘制，我们可以少加一些 padding */
-    .status-bar {
-        padding-top: env(safe-area-inset-top, 16px) !important;
+        width: 90vw !important;
+        height: calc(90vw * 2.167) !important;
+        max-height: 90vh !important;
+        max-height: 90dvh !important;
+        border-radius: 36px !important;
     }
 }
 
-/* ============================================
-   ★★★ 超小屏幕适配（SE / Mini / 矮屏） ★★★
-   ============================================ */
+/* ★ 矮屏手机（横屏或折叠屏） */
 @media screen and (max-width: 768px) and (max-height: 700px) {
-    :root {
-        --status-bar-height: 40px;
-        --dock-height: 70px;
-        --home-indicator-height: 14px;
-        --icon-size: 48px;
-    }
-
-    .status-bar {
-        padding-top: max(10px, env(safe-area-inset-top, 10px)) !important;
-        height: calc(40px + env(safe-area-inset-top, 0px)) !important;
-    }
-
-    .dock-container {
-        padding: 6px 16px !important;
-    }
-}
-
-/* ============================================
-   ★★★ 大屏手机 / 平板适配 ★★★
-   ============================================ */
-@media screen and (min-width: 430px) and (max-width: 768px) {
-    :root {
-        --icon-size: 58px;
-    }
-}
-
-/* ============================================
-   ★★★ 横屏防护 ★★★
-   ============================================ */
-@media screen and (max-width: 768px) and (orientation: landscape) {
     .phone-frame {
-        height: 100vh !important;
-        height: 100dvh !important;
-        height: var(--app-height) !important;
-    }
-
-    .status-bar {
-        padding-left: max(26px, env(safe-area-inset-left, 26px)) !important;
-        padding-right: max(26px, env(safe-area-inset-right, 26px)) !important;
-    }
-
-    .dock-container {
-        padding-left: env(safe-area-inset-left, 0px) !important;
-        padding-right: env(safe-area-inset-right, 0px) !important;
+        width: auto !important;
+        height: 85vh !important;
+        height: 85dvh !important;
+        max-height: none !important;
+        aspect-ratio: 9 / 19.5;
+        border-radius: 30px !important;
     }
 }
